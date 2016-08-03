@@ -4,7 +4,7 @@ A tool to verify twitch users on your teamspeak.
 
 ## Usage
 
-Start the jar, adjust the config and start again.
+Start the jar via command line, adjust the config and start again.
 
 ## Configuration
 
