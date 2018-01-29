@@ -8,17 +8,19 @@ import org.jibble.pircbot.PircBot;
 
 public class TwitchBot extends PircBot {
 	private static VerifyManager vm;
+	private static Config config;
 	
 	public static void main(Config config) {
+		TwitchBot.config = config;
 		TwitchBot bot = new TwitchBot();
 		bot.setVerbose(true);
-		bot.setName("nattfary");
-		bot.setLogin("nattfary");
+		bot.setName(config.getTwitchUser());
+		bot.setLogin(config.getTwitchUser());
 		
 		vm = new VerifyManager();
 		
 		try {
-			bot.connect("irc.chat.twitch.tv", 6667, "oauth:dlr7rddyxvgnb4hxq0osrdad1sl7jt");
+			bot.connect("irc.chat.twitch.tv", 6667, config.getTwitchToken());
 		} catch(NickAlreadyInUseException e) {
 			System.err.println("Nickname already in use");
 		} catch(IrcException e) {
@@ -33,9 +35,13 @@ public class TwitchBot extends PircBot {
 	@Override
 	public void onConnect() {
 		System.out.println("Connected to twitch.");
-		joinChannel("#nattfary");
+		joinChannel("#" + config.getTwitchChannel().toLowerCase());
+		sendRawLine("CAP REQ :twitch.tv/membership\\r\\n");
+		sendRawLine("CAP REQ :twitch.tv/tags\\r\\n");
+		sendRawLine("CAP REQ :twitch.tv/commands\\r\\n");
 	}
 	
+	@Override
 	public void onMessage(String channel, String sender, String login, String hostname, String message) {
 		if(message.equalsIgnoreCase("!verify")) {
 			if(vm.checkUser(sender)) {
